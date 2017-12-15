@@ -4,6 +4,7 @@ import numpy as np
 sns.set()
 from DNA import main as DNA
 
+
 class main():
     def __init__(self, pop_len, mutation_rate, max_iter):
         if pop_len%2 == 0:
@@ -115,7 +116,7 @@ class main():
 
 
 if __name__ == '__main__':
-    population = main(50, 0.05, 10000)
+    population = main(500, 0.01, 10000)
     population.initialize()
     population.fitness_measure()
 
