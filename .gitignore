@@ -1,1 +1,9 @@
-__pycache__/
+build
+__pycache__
+data
+*.msi
+PyQt4
+*.xlsx
+*.db
+*.dbz
+build *
