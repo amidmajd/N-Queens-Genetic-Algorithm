@@ -104,7 +104,7 @@ class main():
     def evaluate(self):
         if self.score.max() >= self.max_score:
             raise ValueError('Answer!')
-        elif self.max_iter == self.generation_num+1:
+        elif self.max_iter == self.generation_num:
             raise ValueError('max iter!')
 
 
@@ -125,7 +125,7 @@ if __name__ == '__main__':
             population.fitness_measure()
             population.evaluate()
             avg_score = np.average(population.score)
-            print('generation : {}  , average fitness : {} == {}%  {}'.format(population.generation_num, round(avg_score,2), round((avg_score/population.max_score)*100, 2), population.get_answer()[0]))
+            print('generation : {0:5d}  ,  average fitness : {1:.2f} == {2:.2f}%    {3}'.format(population.generation_num, avg_score, (avg_score/population.max_score)*100, population.get_answer()[0]))
         except ValueError as e:
             if str(e) == 'low population':
                 print('\n\n', e)
@@ -133,7 +133,7 @@ if __name__ == '__main__':
             else:
                 print(e)
                 Answer = population.get_answer()
-                print('\n\ngeneration : {}  , Answer fitness : {} == {}%    {}'.format(population.generation_num, round(Answer[1],2), round((Answer[1]/population.max_score)*100, 2), Answer[0]))
+                print('\n\ngeneration : {0:5d}  ,  Answer fitness : {1:.2f} == {2:.2f}%    {3}'.format(population.generation_num, Answer[1], (Answer[1]/population.max_score)*100, Answer[0]))
                 print('Time : {}s'.format(round(time.time() - t0, 2)))
                 # print(population.fitness(Answer[0]))
                 break
