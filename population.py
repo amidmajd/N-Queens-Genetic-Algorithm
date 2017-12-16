@@ -1,6 +1,7 @@
 from matplotlib import pyplot as plt
 import seaborn as sns
 import numpy as np
+import time
 sns.set()
 from DNA import main as DNA
 
@@ -28,26 +29,26 @@ class main():
 
     def fitness(self, cromosome):
         score = 0
-        # check if any 2 element are the same in cromosome
+        # row or col check
         score += len(np.unique(cromosome))
-        # print('1',cromosome, score)
 
-        # check for 2 queens are in diameter hazard
-        for g in range(len(cromosome)):
-            try:
-                if cromosome[g] != cromosome[g+1]+1 and \
-                   cromosome[g] != cromosome[g+1]-1:
-                       score += 1
-            except IndexError as e:
-                # last index error handle
-                # print(e)
-                pass
-        # print('2',cromosome, score)
+        # diagonal check
+        for i in range(len(cromosome)):
+            for j in range(len(cromosome)):
+                if i != j:
+                    dx = abs(i - j)
+                    dy = abs(cromosome[i] - cromosome[j])
+                    if dx != dy:
+                        score += 1
 
         return np.power(score, 2)
 
 
     def fitness_measure(self):
+        dna_len = len(DNA().cromosome)
+        self.max_score = np.power(dna_len + dna_len*(dna_len-1) , 2)
+        # print('maxxxxxx:', self.max_score)
+
         for c, cromosome in enumerate(self.pop):
             self.score[c] = self.fitness(cromosome)
         # print('min:', self.score.min())
@@ -101,10 +102,7 @@ class main():
 
 
     def evaluate(self):
-        dna = DNA().cromosome
-        dna_len = len(dna)
-        # print('maxxxxxx:', np.power(dna_len-1 + dna_len, 2))
-        if self.score.max() >= np.power(dna_len-1 + dna_len, 2):
+        if self.score.max() >= self.max_score:
             raise ValueError('Answer!')
         elif self.max_iter == self.generation_num+1:
             raise ValueError('max iter!')
@@ -116,7 +114,8 @@ class main():
 
 
 if __name__ == '__main__':
-    population = main(500, 0.01, 10000)
+    t0 = time.time()
+    population = main(400, 0.01, 10000)
     population.initialize()
     population.fitness_measure()
 
@@ -125,7 +124,8 @@ if __name__ == '__main__':
             population.selection()
             population.fitness_measure()
             population.evaluate()
-            print('generation : {}  , average fitness : {}    {}'.format(population.generation_num, np.average(population.score), population.get_answer()[0]))
+            avg_score = np.average(population.score)
+            print('generation : {}  , average fitness : {} == {}%  {}'.format(population.generation_num, round(avg_score,2), round((avg_score/population.max_score)*100, 2), population.get_answer()[0]))
         except ValueError as e:
             if str(e) == 'low population':
                 print('\n\n', e)
@@ -133,6 +133,7 @@ if __name__ == '__main__':
             else:
                 print(e)
                 Answer = population.get_answer()
-                print('\n\ngeneration : {}  , Answer fitness : {}    {}'.format(population.generation_num, Answer[1], Answer[0]))
+                print('\n\ngeneration : {}  , Answer fitness : {} == {}%    {}'.format(population.generation_num, round(Answer[1],2), round((Answer[1]/population.max_score)*100, 2), Answer[0]))
+                print('Time : {}s'.format(round(time.time() - t0, 2)))
                 # print(population.fitness(Answer[0]))
                 break
