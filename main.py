@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+plt.rcParams['figure.figsize'] = (6,6)
 import numpy as np
 import time
 import sys
@@ -51,9 +52,9 @@ class GA_thread(QThread):
                 log = [population.generation_num, avg_score, (avg_score/population.max_score)*100, population.get_answer()[0]]
                 self.log_sig.emit(log)
             except ValueError as e:
-                if str(e) == 'low population':
+                if str(e) == 'Bad Population':
                     # print('\n\n', e)
-                    self.log_sig.emit(['\nLow Population!'])
+                    self.log_sig.emit(['\nBad Population!'])
                     break
                 else:
                     self.Answer = population.get_answer()
@@ -108,33 +109,51 @@ class main(QtGui.QMainWindow, UI):
         if log_len == 4:
             log_style = 'generation : {0:6d}   ,   average fitness : {1:10.2f}     {2:3.2f}%'
             self.log_output.appendPlainText(log_style.format(log[0], log[1], log[2]))
-            self.log_queens.appendPlainText('g{0:6d} => '.format(log[0]) + ', '.join([str(x) for x in log[3]]))
+            self.log_queens.appendPlainText('g{0:6d} => '.format(log[0]) + ', '.join([str(x+1) for x in log[3]]))
         elif log_len == 1:
             self.log_output.appendPlainText(log[0])
 
 
-    def done(self):
-        QtGui.QMessageBox.information(self, "Done!", "Answer Found!")
+    def plot_stuf(self):
 
-        plot_ans = np.zeros([self.d_dna_n, self.d_dna_n], dtype=np.int)
-        for g, gen in enumerate(self.GA.Answer[0]):
-            plot_ans[gen, g] = 1
-        # print(plot_ans)
+        plot_ans = np.zeros([self.d_dna_n, self.d_dna_n])
+
+        for r, x in enumerate(plot_ans):
+            for c, y in enumerate(x):
+                if (r + c) % 2 == 0:
+                    plot_ans[r, c] = 1
 
         plt.cla()
-        plt.imshow(plot_ans,cmap='gray')
+        plt.imshow(plot_ans,cmap='gray', interpolation='nearest',
+                    extent=(0.5, self.d_dna_n + 0.5, 0.5, self.d_dna_n + 0.5))
+        row_labels = col_labels = range(1, self.d_dna_n + 1)
+        plt.xticks(range(1, self.d_dna_n + 1), col_labels)
+        plt.yticks(range(1, self.d_dna_n + 1), row_labels)
+        plt.xlim(0.5, self.d_dna_n + 0.5)
+        plt.ylim(0.5, self.d_dna_n + 0.5)
+        ax = plt.gca()
+        for line in ax.xaxis.get_ticklines():
+            line.set_visible(False)
+        for line in ax.yaxis.get_ticklines():
+            line.set_visible(False)
+
+        plot_matrix = self.GA.Answer[0] + 1
+
         plt.title('{} Queens'.format(self.d_dna_n))
-        # plt.grid(False)
-        plt.xticks(range(self.d_dna_n), range(self.d_dna_n))
-        plt.yticks(range(self.d_dna_n), range(self.d_dna_n))
-        plt.tight_layout()
+        plt.grid(False)
+        plt.scatter(range(1,self.d_dna_n+1), plot_matrix, color='red', s=4000//self.d_dna_n)
+
         # plt.show()
-        plt.savefig('tmp.png')
+        plt.savefig('N_Q_Answer.png')
 
-        pixmap = QtGui.QPixmap('tmp.png')
+        pixmap = QtGui.QPixmap('N_Q_Answer.png')
         self.log_shape.setPixmap(pixmap)
+        # os.remove('N_Q_Answer.png')
 
 
+    def done(self):
+        QtGui.QMessageBox.information(self, "Done!", "Answer Found!")
+        self.plot_stuf()
 
 
 if __name__ == '__main__':

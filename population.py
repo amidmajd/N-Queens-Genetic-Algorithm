@@ -76,7 +76,7 @@ class main():
 
     def selection(self):
         if self.score.max() - self.score.min() == 0:
-            raise ValueError('low population')
+            raise ValueError('Bad Population')
         # print((self.score.max() - self.score.min()))
         reg_score = (self.score - self.score.min()) / (self.score.max() - self.score.min())
         self.score_pool = []
@@ -128,7 +128,7 @@ if __name__ == '__main__':
             avg_score = np.average(population.score)
             print('generation : {0:5d}  ,  average fitness : {1:.2f} == {2:.2f}%    {3}'.format(population.generation_num, avg_score, (avg_score/population.max_score)*100, population.get_answer()[0]))
         except ValueError as e:
-            if str(e) == 'low population':
+            if str(e) == 'Bad Population':
                 print('\n\n', e)
                 break
             else:
