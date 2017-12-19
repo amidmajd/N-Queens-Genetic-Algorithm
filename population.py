@@ -7,7 +7,7 @@ from DNA import main as DNA
 
 
 class main():
-    def __init__(self, pop_len, mutation_rate, max_iter):
+    def __init__(self, dna_n, pop_len, mutation_rate, max_iter):
         if pop_len%2 == 0:
             self.pop_len = pop_len
         else:
@@ -17,11 +17,12 @@ class main():
         self.pop = []
         self.score = np.zeros((self.pop_len))
         self.generation_num = 0
+        self.dna_n = dna_n
 
 
     def initialize(self):
         for c in range(self.pop_len):
-            dna = DNA().cromosome
+            dna = DNA(self.dna_n).cromosome
             self.pop.append(dna)
         self.pop = np.array(self.pop)
         # print(self.pop.shape)
@@ -45,7 +46,7 @@ class main():
 
 
     def fitness_measure(self):
-        dna_len = len(DNA().cromosome)
+        dna_len = len(DNA(self.dna_n).cromosome)
         self.max_score = np.power(dna_len + dna_len*(dna_len-1) , 2)
         # print('maxxxxxx:', self.max_score)
 
@@ -57,7 +58,7 @@ class main():
 
 
     def cross_over(self, p1, p2):
-        dna = DNA().cromosome
+        dna = DNA(self.dna_n).cromosome
         random_point = np.random.randint(0, len(dna))
         c1 = np.concatenate([np.array(p1[:random_point]) , np.array(p2[random_point:])])
         c2 = np.concatenate([np.array(p2[:random_point]) , np.array(p1[random_point:])])
@@ -68,7 +69,7 @@ class main():
         for g, gen in enumerate(cromosome):
             r = np.random.rand()
             if r < self.mut_rate:
-                dna = DNA().cromosome
+                dna = DNA(self.dna_n).cromosome
                 cromosome[g] = np.random.choice(dna)
         return cromosome
 
@@ -115,7 +116,7 @@ class main():
 
 if __name__ == '__main__':
     t0 = time.time()
-    population = main(400, 0.01, 10000)
+    population = main(16, 400, 0.01, 10000)
     population.initialize()
     population.fitness_measure()
 
