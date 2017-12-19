@@ -54,7 +54,7 @@ class GA_thread(QThread):
             except ValueError as e:
                 if str(e) == 'Bad Population':
                     # print('\n\n', e)
-                    self.log_sig.emit(['\nBad Population!'])
+                    self.log_sig.emit(['\nBad Population Or Low Queens!'])
                     break
                 else:
                     self.Answer = population.get_answer()

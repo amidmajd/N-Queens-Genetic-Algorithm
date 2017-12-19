@@ -79,6 +79,20 @@ class main():
             raise ValueError('Bad Population')
         # print((self.score.max() - self.score.min()))
         reg_score = (self.score - self.score.min()) / (self.score.max() - self.score.min())
+
+        self.new_generation = []
+        top_20p_len = self.pop_len // 8
+        co_pop_len = self.pop_len - top_20p_len
+
+        tmp_score = []
+        for i,c in enumerate(self.pop):
+            tmp_score.append([i, self.fitness(c)])
+        tmp_score = sorted(tmp_score, key= lambda x: x[1], reverse=True)
+
+        for i in range(top_20p_len):
+            self.new_generation.append(self.pop[tmp_score[i][0]])
+
+
         self.score_pool = []
         for i, item in enumerate(reg_score):
             for j in range(int(np.floor(item * 100))):
@@ -86,18 +100,23 @@ class main():
 
         self.score_pool = np.array(self.score_pool)
 
-        self.new_generation = []
-        for i in range(self.pop_len // 2):
+        for i in range(co_pop_len // 2):
             r1 = np.random.randint(0, len(self.score_pool))
             r2 = np.random.randint(0, len(self.score_pool))
             parent1 = self.score_pool[r1]
             parent2 = self.score_pool[r2]
 
             child1, child2 = self.cross_over(parent1, parent2)
+            # child1, child2 = self.mutation(child1), self.mutation(child2)
             self.new_generation.append(child1)
             self.new_generation.append(child2)
 
+        for i in range(self.pop_len - len(self.new_generation)):
+            r = np.random.randint(0, self.pop_len)
+            self.new_generation.append(self.pop[r])
+
         self.new_generation = np.array(self.new_generation)
+        # self.pop = self.new_generation
         self.pop = np.array([self.mutation(c) for c in self.new_generation])
         self.generation_num += 1
 
@@ -116,7 +135,7 @@ class main():
 
 if __name__ == '__main__':
     t0 = time.time()
-    population = main(16, 400, 0.01, 10000)
+    population = main(16, 300, 0.03, 1000)
     population.initialize()
     population.fitness_measure()
 
