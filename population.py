@@ -59,9 +59,13 @@ class main():
 
     def cross_over(self, p1, p2):
         dna = DNA(self.dna_n).cromosome
-        random_point = np.random.randint(0, len(dna))
-        c1 = np.concatenate([np.array(p1[:random_point]) , np.array(p2[random_point:])])
-        c2 = np.concatenate([np.array(p2[:random_point]) , np.array(p1[random_point:])])
+        random_point1 = np.random.randint(0, len(dna))
+        # random_point2 = np.random.randint(0, len(dna))
+        # random_point1, random_point2 = sorted([random_point1, random_point2])
+        # c1 = np.concatenate([np.array(p1[:random_point1]) , np.array(p2[random_point1:random_point2]), np.array(p1[random_point2:])])
+        # c1 = np.concatenate([np.array(p1[:random_point1]) , np.array(p2[random_point1:random_point2]), np.array(p1[random_point2:])])
+        c1 = np.concatenate([np.array(p1[:random_point1]) , np.array(p2[random_point1:])])
+        c2 = np.concatenate([np.array(p2[:random_point1]) , np.array(p1[random_point1:])])
         return c1, c2
 
 
@@ -70,7 +74,12 @@ class main():
             r = np.random.rand()
             if r < self.mut_rate:
                 dna = DNA(self.dna_n).cromosome
-                cromosome[g] = np.random.choice(dna)
+                random_gen = np.random.choice(dna)
+                while cromosome[g] == random_gen:
+                    random_gen = np.random.choice(dna)
+                else:
+                    cromosome[g] = random_gen
+            # break
         return cromosome
 
 
@@ -81,17 +90,16 @@ class main():
         reg_score = (self.score - self.score.min()) / (self.score.max() - self.score.min())
 
         self.new_generation = []
-        top_20p_len = self.pop_len // 8
-        co_pop_len = self.pop_len - top_20p_len
+        top_len = self.pop_len // (self.dna_n) * 2
+        co_pop_len = self.pop_len - top_len
 
         tmp_score = []
         for i,c in enumerate(self.pop):
             tmp_score.append([i, self.fitness(c)])
         tmp_score = sorted(tmp_score, key= lambda x: x[1], reverse=True)
 
-        for i in range(top_20p_len):
+        for i in range(top_len):
             self.new_generation.append(self.pop[tmp_score[i][0]])
-
 
         self.score_pool = []
         for i, item in enumerate(reg_score):
@@ -106,6 +114,13 @@ class main():
             parent1 = self.score_pool[r1]
             parent2 = self.score_pool[r2]
 
+            while( parent1 == parent2).all():
+                r1 = np.random.randint(0, len(self.score_pool))
+                r2 = np.random.randint(0, len(self.score_pool))
+                parent1 = self.score_pool[r1]
+                parent2 = self.score_pool[r2]
+                # print(r1, r2)
+
             child1, child2 = self.cross_over(parent1, parent2)
             # child1, child2 = self.mutation(child1), self.mutation(child2)
             self.new_generation.append(child1)
@@ -116,9 +131,9 @@ class main():
             self.new_generation.append(self.pop[r])
 
         self.new_generation = np.array(self.new_generation)
-        # self.pop = self.new_generation
-        self.pop = np.array([self.mutation(c) for c in self.new_generation])
         self.generation_num += 1
+        self.pop = np.array([self.mutation(c) for c in self.new_generation])
+        # self.pop = np.array(self.new_generation)
 
 
     def evaluate(self):
@@ -135,7 +150,7 @@ class main():
 
 if __name__ == '__main__':
     t0 = time.time()
-    population = main(16, 300, 0.03, 1000)
+    population = main(16, 400, 0.02, 1000)
     population.initialize()
     population.fitness_measure()
 
