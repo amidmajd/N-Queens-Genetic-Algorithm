@@ -150,7 +150,7 @@
            </font>
           </property>
           <property name="text">
-           <string>300</string>
+           <string>200</string>
           </property>
           <property name="maxLength">
            <number>20</number>
@@ -187,7 +187,7 @@
            </font>
           </property>
           <property name="text">
-           <string>3</string>
+           <string>2</string>
           </property>
           <property name="maxLength">
            <number>2</number>
@@ -224,7 +224,7 @@
            </font>
           </property>
           <property name="text">
-           <string>1000</string>
+           <string>10000</string>
           </property>
           <property name="maxLength">
            <number>20</number>

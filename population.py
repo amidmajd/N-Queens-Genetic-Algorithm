@@ -98,7 +98,18 @@ class main():
 
 
     def selection(self):
+<<<<<<< HEAD
         self.new_generation = []
+=======
+        if self.score.max() - self.score.min() == 0:
+            raise ValueError('low population')
+        # print((self.score.max() - self.score.min()))
+        reg_score = (self.score - self.score.min()) / (self.score.max() - self.score.min())
+        self.score_pool = []
+        for i, item in enumerate(reg_score):
+            for j in range(int(np.floor(item * 100))):
+                self.score_pool.append(self.pop[i])
+>>>>>>> parent of 5065615... plot completed succesfully :+1:
 
         for i in range(self.pop_len):
             ppc = np.random.randint(0, self.pop_len, size=3)
@@ -166,7 +177,7 @@ if __name__ == '__main__':
             if population.generation_num % 100 == 0:
                 print('generation : {0:5d}  , fitness : {1:.2f} == {2:.2f}%    {3}'.format(population.generation_num, avg_score, (avg_score/population.max_score)*100, population.get_answer()[0]))
         except ValueError as e:
-            if str(e) == 'Bad Population':
+            if str(e) == 'low population':
                 print('\n\n', e)
                 break
             else:
