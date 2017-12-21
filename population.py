@@ -71,7 +71,7 @@ class main():
             if r < self.mut_rate:
                 dna = DNA(self.dna_n).cromosome
                 random_g = np.random.choice(dna)
-                while random_g == cromosome[g]:
+                while random_g == gen and list(cromosome).count(random_g) != 1:
                     random_g = np.random.choice(dna)
                 else:
                     cromosome[g] = random_g
@@ -126,7 +126,7 @@ class main():
 
 if __name__ == '__main__':
     t0 = time.time()
-    population = main(16, 400, 0.01, 10000)
+    population = main(16, 350, 0.01, 10000)
     population.initialize()
     population.fitness_measure()
 
