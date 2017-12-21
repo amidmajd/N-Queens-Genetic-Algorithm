@@ -70,7 +70,11 @@ class main():
             r = np.random.rand()
             if r < self.mut_rate:
                 dna = DNA(self.dna_n).cromosome
-                cromosome[g] = np.random.choice(dna)
+                random_g = np.random.choice(dna)
+                while random_g == cromosome[g]:
+                    random_g = np.random.choice(dna)
+                else:
+                    cromosome[g] = random_g
         return cromosome
 
 
@@ -92,6 +96,12 @@ class main():
             r2 = np.random.randint(0, len(self.score_pool))
             parent1 = self.score_pool[r1]
             parent2 = self.score_pool[r2]
+
+            while (parent1 == parent2).all():
+                r1 = np.random.randint(0, len(self.score_pool))
+                r2 = np.random.randint(0, len(self.score_pool))
+                parent1 = self.score_pool[r1]
+                parent2 = self.score_pool[r2]
 
             child1, child2 = self.cross_over(parent1, parent2)
             self.new_generation.append(child1)
