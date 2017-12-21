@@ -11,19 +11,13 @@ class main():
         if pop_len%2 == 0:
             self.pop_len = pop_len
         else:
-            self.pop_len = pop_len - 1
+            self.pop_len = pop_len + 1
         self.mut_rate = mutation_rate
         self.max_iter = max_iter
         self.pop = []
         self.score = np.zeros((self.pop_len))
         self.generation_num = 0
         self.dna_n = dna_n
-        self.max_score = np.power(self.dna_n + self.dna_n*(self.dna_n-1) , 2)
-
-
-
-    def sort(self):
-        self.pop = np.array(sorted(list(self.pop), key=self.fitness, reverse=True))
 
 
     def initialize(self):
@@ -31,7 +25,7 @@ class main():
             dna = DNA(self.dna_n).cromosome
             self.pop.append(dna)
         self.pop = np.array(self.pop)
-        self.sort()
+        # print(self.pop.shape)
 
 
     def fitness(self, cromosome):
@@ -53,6 +47,7 @@ class main():
 
     def fitness_measure(self):
         dna_len = len(DNA(self.dna_n).cromosome)
+        self.max_score = np.power(dna_len + dna_len*(dna_len-1) , 2)
         # print('maxxxxxx:', self.max_score)
 
         for c, cromosome in enumerate(self.pop):
@@ -63,121 +58,77 @@ class main():
 
 
     def cross_over(self, p1, p2):
-        if (p1 == p2).all():
-            p2 = DNA(self.dna_n).cromosome
-
-        possible = [x for x in range(self.dna_n)]
-        c = [-1] * self.dna_n
-
-        for i in range(self.dna_n):
-            if p1[i] == p2[i]:
-                try:
-                    possible.remove(c[i])
-                    c[i] = p1[i]
-                except:
-                    pass
-
-        for i in range(self.dna_n):
-            if c[i] == -1:
-                c[i] = np.random.choice(possible)
-                try:
-                    possible.remove(c[i])
-                except:
-                    pass
-
-        return np.array(c)
+        dna = DNA(self.dna_n).cromosome
+        random_point = np.random.randint(0, len(dna))
+        c1 = np.concatenate([np.array(p1[:random_point]) , np.array(p2[random_point:])])
+        c2 = np.concatenate([np.array(p2[:random_point]) , np.array(p1[random_point:])])
+        return c1, c2
 
 
     def mutation(self, cromosome):
-        r = np.random.random()
-        if r < self.mut_rate:
-            indx1 = np.random.randint(0, self.dna_n)
-            indx2 = np.random.randint(0, self.dna_n)
-            cromosome[indx1], cromosome[indx2] = cromosome[indx2], cromosome[indx1]
+        for g, gen in enumerate(cromosome):
+            r = np.random.rand()
+            if r < self.mut_rate:
+                dna = DNA(self.dna_n).cromosome
+                cromosome[g] = np.random.choice(dna)
         return cromosome
 
 
     def selection(self):
-<<<<<<< HEAD
-        self.new_generation = []
-=======
         if self.score.max() - self.score.min() == 0:
-            raise ValueError('low population')
+            raise ValueError('Bad Population')
         # print((self.score.max() - self.score.min()))
         reg_score = (self.score - self.score.min()) / (self.score.max() - self.score.min())
         self.score_pool = []
         for i, item in enumerate(reg_score):
             for j in range(int(np.floor(item * 100))):
                 self.score_pool.append(self.pop[i])
->>>>>>> parent of 5065615... plot completed succesfully :+1:
 
-        for i in range(self.pop_len):
-            ppc = np.random.randint(0, self.pop_len, size=3)
-            ppc.sort()
+        self.score_pool = np.array(self.score_pool)
 
-            p1 = self.pop[ppc[0]]
-            p2 = self.pop[ppc[1]]
-            old_c = ppc[2]
+        self.new_generation = []
+        for i in range(self.pop_len // 2):
+            r1 = np.random.randint(0, len(self.score_pool))
+            r2 = np.random.randint(0, len(self.score_pool))
+            parent1 = self.score_pool[r1]
+            parent2 = self.score_pool[r2]
 
-            new_c = self.cross_over(p1, p2)
-            new_c = self.mutation(new_c)
+            child1, child2 = self.cross_over(parent1, parent2)
+            self.new_generation.append(child1)
+            self.new_generation.append(child2)
 
-            self.pop[old_c] = new_c
-            self.sort()
+        self.new_generation = np.array(self.new_generation)
+        self.pop = np.array([self.mutation(c) for c in self.new_generation])
         self.generation_num += 1
-
-        #
-        # p = np.divide(self.score, self.score.sum())
-        #
-        # for i in range(self.pop_len // 2):
-        #     parent1 = self.pop[np.random.choice(range(self.pop_len), p=p)]
-        #     parent2 = self.pop[np.random.choice(range(self.pop_len), p=p)]
-        #
-        #     while (parent1 == parent2).all():
-        #         parent1 = self.pop[np.random.choice(range(self.pop_len), p=p)]
-        #         parent2 = self.pop[np.random.choice(range(self.pop_len), p=p)]
-        #
-        #     child1, child2 = self.cross_over(parent1, parent2)
-        #     # child1, child2 = self.mutation(child1), self.mutation(child2)
-        #     self.new_generation.append(child1)
-        #     self.new_generation.append(child2)
-
-        # # for i in range(self.pop_len - len(self.new_generation)):
-        # #     r = np.random.randint(0, self.pop_len)
-        # #     self.new_generation.append(self.pop[r])
-        #
-        # self.new_generation = np.array(self.new_generation)
-        # self.generation_num += 1
-        # self.pop = np.array([self.mutation(c) for c in self.new_generation])
-        # self.pop = np.array(self.new_generation)
 
 
     def evaluate(self):
-        if self.fitness(self.pop[0]) >= self.max_score:
+        if self.score.max() >= self.max_score:
             raise ValueError('Answer!')
         elif self.max_iter == self.generation_num:
             raise ValueError('max iter!')
 
 
     def get_answer(self):
-        return (self.pop[0], self.fitness(self.pop[0]))
+        max_score = self.score.argmax()
+        return (self.pop[max_score], self.score[max_score])
 
 
 if __name__ == '__main__':
     t0 = time.time()
-    population = main(16, 10, 0.001, 100000)
+    population = main(16, 400, 0.01, 10000)
     population.initialize()
+    population.fitness_measure()
 
     while True:
         try:
             population.selection()
-            # population.fitness_measure()
+            population.fitness_measure()
             population.evaluate()
-            avg_score = population.fitness(population.pop[0])
-            if population.generation_num % 100 == 0:
-                print('generation : {0:5d}  , fitness : {1:.2f} == {2:.2f}%    {3}'.format(population.generation_num, avg_score, (avg_score/population.max_score)*100, population.get_answer()[0]))
+            avg_score = np.average(population.score)
+            print('generation : {0:5d}  ,  average fitness : {1:.2f} == {2:.2f}%    {3}'.format(population.generation_num, avg_score, (avg_score/population.max_score)*100, population.get_answer()[0]))
         except ValueError as e:
-            if str(e) == 'low population':
+            if str(e) == 'Bad Population':
                 print('\n\n', e)
                 break
             else:
