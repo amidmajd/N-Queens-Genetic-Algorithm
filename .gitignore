@@ -7,3 +7,4 @@ PyQt4
 *.db
 *.dbz
 build *
+n-queen-GA-applied
